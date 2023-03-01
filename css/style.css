@@ -8,7 +8,10 @@
 }
 
 body {
-    background-color: #454444
+    background-color: #454444;
+}
+.bodyDiv1H23 {
+    margin: 1vh;
 }
 
 /*.navParagraph1H23{
