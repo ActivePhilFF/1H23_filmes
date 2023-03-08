@@ -13,13 +13,15 @@ class Director {
 }
 
 class Film {
-    constructor(id, title, year, category, poster, director, actors, rating, review) {
+    constructor(id, title, year, category, duration, sinopsis, poster, direction, actors, rating, review) {
         this.id = id;
         this.title = title;
         this.year = year;
         this.category = category;
+        this.duration = duration;
+        this.sinopsis = sinopsis;
         this.poster = poster;
-        this.director = director;
+        this.direction = direction;
         this.actors = actors;
         this.rating = rating;
         this.review = review;
