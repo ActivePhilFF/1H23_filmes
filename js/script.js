@@ -16,7 +16,7 @@ let genre = "Action"
 let sinopsis = "When a beautiful stranger (Carrie-Anne Moss) leads computer hacker Neo (Keanu Reeves) to a forbidding underworld, he discovers the shocking truth--the life he knows is the elaborate deception of an evil cyber-intelligence."
 let poster = "https://cdn.shopify.com/s/files/1/1416/8662/products/the_matrix_1999_fr_original_film_art.jpg?v=1640646540"
 
-let film = new Film(
+/* let film = new Film(
     1,
     "Matrix",
     1999,
@@ -28,27 +28,49 @@ let film = new Film(
     cast,
     14,
     null
-)
+) */
 
 let btnSearchFilm = document.querySelector("#btn-search-film");
 let inputSearchFilm = document.querySelector("#input-search-film");
 
 btnSearchFilm.onclick = () => {
+    console.log(inputSearchFilm.value.length)
     if (inputSearchFilm.value.length > 0) {
-        fetch("http://www.omdbapi.com/?apikey=ed5e5ad5&s=" + inputSearchFilm.value, { mode: "no-cors" }).then((resp) => resp.json()).then((resp) => {
-            console.log(resp);
-        })
-    }
-    else {
-        console.log("Nothing here")
+        let films = new Array();
+        fetch("http://www.omdbapi.com/?apikey=ed5e5ad5&s=" + inputSearchFilm.value)
+            .then((resp) => resp.json())
+            .then((resp) => {
+                resp.Search.forEach((item) => {
+                    let film = new Film(
+                        item.imdbID,
+                        item.Title,
+                        item.Year,
+                        null,
+                        null,
+                        null,
+                        item.Poster,
+                        null,
+                        null,
+                        null,
+                        null
+                    );
+                    films.push(film);
+                });
+                listFilms(films)
+
+            })
+
     }
     return false;
 }
 
-getCard = () => {
-    let card = document.createElement("div").setAttribute("class", "card");
-    let imgCartaz = document.createElement("img").setAttribute("src", this.cartaz);
-    imgCartaz.setAttribute("class", "card-img-top");
-    let cardBody = document.createElement("dis").setAttribute("class", "card-body");
-    let hCardTitle = document.createElement("h5").setAttribute("class", "card-title");
+let listFilms = async (films) => {
+    let listFilms = await document.querySelector("#films-list");
+    listFilms.innerHTML = "";
+    if (films.length > 0) {
+        films.forEach(async (film) => {
+            listFilms.appendChild(await film.getCard());
+        })
+    }
 }
+

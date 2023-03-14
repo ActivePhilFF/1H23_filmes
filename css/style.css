@@ -1,17 +1,25 @@
-*{
+* {
     margin: 0;
     padding: 0;
 }
 
-.nav1H23{
+.nav1H23 {
     background-color: #222;
 }
 
 body {
     background-color: #454444;
 }
+
 .bodyDiv1H23 {
     margin: 1vh;
+}
+
+#films-list {
+    display: flex;
+    justify-content: start;
+    flex-wrap: wrap;
+    padding: 2rem;
 }
 
 /*.navParagraph1H23{
