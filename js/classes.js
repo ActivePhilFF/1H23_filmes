@@ -13,7 +13,7 @@ class Director {
 }
 
 class Film {
-    constructor(id, title, year, category, duration, sinopsis, poster, direction, actors, rating, review) {
+    constructor(id, title, year, category, duration, sinopsis, poster, direction, actors, rating, review, btnDetails) {
         this.id = id;
         this.title = title;
         this.year = year;
@@ -25,37 +25,55 @@ class Film {
         this.actors = actors;
         this.rating = rating;
         this.review = review;
+        this.btnDetails = null;
     }
 
     getCard = async () => {
         let card = document.createElement("div");
-        card.setAttribute("class", "card");
-        let imgCartaz = document.createElement("img");
-        imgCartaz.setAttribute("class", "card-img-top");
-        imgCartaz.setAttribute("src", this.poster);
+        let imgPoster = document.createElement("img");
         let cardBody = document.createElement("div")
-        cardBody.setAttribute("class", "card-body");
         let hCardTitle = document.createElement("h5")
+        let divDetails = document.createElement("div");
+        let divGenre = document.createElement("div");
+        let divYear = document.createElement("div");
+        let divRating = document.createElement("div");
+
+        card.setAttribute("class", "card");
+        imgPoster.setAttribute("class", "card-img-top");
+        imgPoster.setAttribute("src", this.poster);
+        cardBody.setAttribute("class", "card-body");
         hCardTitle.setAttribute("class", "card-title");
-        let divDetalhes = document.createElement("div");
-        divDetalhes.setAttribute("class", "display:flex; justify-content:space-around");
-        let divGenero = document.createElement("div");
-        divGenero.setAttribute("style", "flex-grow:1");
-        let divAnoProducao = document.createElement("div");
-        divAnoProducao.setAttribute("style", "flex-grow:1");
-        let divClassificacao = document.createElement("div");
-        divClassificacao.setAttribute("style", "flex-grow:1");
+        divDetails.setAttribute("class", "display:flex; justify-content:space-around");
+        divGenre.setAttribute("style", "flex-grow:1");
+        divYear.setAttribute("style", "flex-grow:1");
+        divRating.setAttribute("style", "flex-grow:1");
+
         hCardTitle.appendChild(document.createTextNode(this.title))
-        divGenero.appendChild(document.createTextNode(this.genre))
-        divAnoProducao.appendChild(document.createTextNode(this.year))
-        divClassificacao.appendChild(document.createTextNode(this.rating))
-        divDetalhes.appendChild(divGenero);
-        divDetalhes.appendChild(divAnoProducao);
-        divDetalhes.appendChild(divClassificacao);
-        card.appendChild(imgCartaz);
+        divGenre.appendChild(document.createTextNode(this.genre))
+        divYear.appendChild(document.createTextNode(this.year))
+        divRating.appendChild(document.createTextNode(this.rating))
+        divDetails.appendChild(divGenre);
+        divDetails.appendChild(divYear);
+        divDetails.appendChild(divRating);
+        card.appendChild(imgPoster);
         card.appendChild(cardBody);
         cardBody.appendChild(hCardTitle)
-        cardBody.appendChild(divDetalhes);
+        cardBody.appendChild(divDetails);
+
+        this.setDetailsBtn();
+        cardBody.appendChild(this.getDetailsBtn());
+
         return card;
+    }
+
+    setDetailsBtn = () => {
+        this.btnDetails = document.createElement('button');
+        this.btnDetails.appendChild(document.createTextNode("Detalhes"));
+        this.btnDetails.setAttribute("id", this.id);
+        this.btnDetails.setAttribute("class", "btn btn-dark btnFilmDetails")
+    }
+
+    getDetailsBtn = () => {
+        return this.btnDetails
     }
 }
