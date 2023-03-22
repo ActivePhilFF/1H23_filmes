@@ -66,11 +66,72 @@ class Film {
         return card;
     }
 
+    getDetailedCard = async (content) => {
+        let makeTag = (tag, htmlClass, style, text, url) => {
+            let htmlTag = document.createElement(tag);
+            if (htmlClass) {
+                htmlTag.setAttribute("class", htmlClass)
+            }
+            if (style) {
+                htmlTag.setAttribute("style", style)
+            }
+            if (text) {
+                htmlTag.appendChild(document.createTextNode(text))
+            }
+            if (url) {
+                htmlTag.setAttribute("src", url)
+            }
+
+            return htmlTag;
+        }
+
+        let mainDiv = makeTag("div", "card mb-3", "max-width: 900px;")
+        let rowDiv = makeTag("div", "row g-0")
+        let posterDiv = makeTag("div", "col-md-4")
+        let detailsDiv = makeTag("div", "col-md-8")
+        let cardBodyDiv = makeTag("div", "card-body")
+        let h5 = makeTag("h5", "card-title", null, content.title)
+        let img = makeTag("img", "img-responsive rounded-start", null, null, content.url)
+        let pYear = makeTag("p", "card-text pCard", null, "Year: " + content.year)
+        let pGenre = makeTag("p", "card-text pCard", null, "Genre: " + content.genre)
+        let pSinopsis = makeTag("p", "card-text pCard", null, "Sinopsis: " + content.sinopsis)
+        let pDirection = makeTag("p", "card-text pCard", null, "Direction: " + content.direction)
+        let pActors = makeTag("p", "card-text pCard", null, "Actors: " + content.actors)
+        let pDuration = makeTag("p", "card-text pCard", null, "Duration: " + content.duration)
+        let pRating = makeTag("p", "card-text pCard", null, "Rating: " + content.rating)
+
+        cardBodyDiv.appendChild(h5);
+        cardBodyDiv.appendChild(pYear);
+        cardBodyDiv.appendChild(pGenre);
+        cardBodyDiv.appendChild(pSinopsis);
+        cardBodyDiv.appendChild(pDirection);
+        cardBodyDiv.appendChild(pActors);
+        cardBodyDiv.appendChild(pDuration);
+        cardBodyDiv.appendChild(pRating);
+        cardBodyDiv.appendChild(this.getCloseBtn())
+        detailsDiv.appendChild(cardBodyDiv)
+        posterDiv.appendChild(img)
+        rowDiv.appendChild(posterDiv)
+        rowDiv.appendChild(detailsDiv)
+        mainDiv.appendChild(rowDiv)
+
+        return mainDiv;
+    }
+
     setDetailsBtn = () => {
         this.btnDetails = document.createElement('button');
-        this.btnDetails.appendChild(document.createTextNode("Detalhes"));
+        this.btnDetails.appendChild(document.createTextNode("Details"));
         this.btnDetails.setAttribute("id", this.id);
         this.btnDetails.setAttribute("class", "btn btn-dark btnFilmDetails")
+    }
+
+    getCloseBtn = () => {
+       let button = document.createElement('button');
+       button.appendChild(document.createTextNode("Close"));
+       button.setAttribute("id", "closeCard");
+       button.setAttribute("class", "btn btn-dark btnFilmDetails")
+       button.setAttribute("onclick","unhideMainDiv()")
+       return button;
     }
 
     getDetailsBtn = () => {

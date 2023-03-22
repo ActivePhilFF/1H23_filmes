@@ -22,6 +22,16 @@ body {
     padding: 2rem;
 }
 
+.pCard {
+    padding: 0;
+    padding-bottom: 1rem;
+    margin: 0;
+}
+
+.imgCard {
+    max-height: 100%;
+}
+
 /*.navParagraph1H23{
     color: #F35;
 }*/
