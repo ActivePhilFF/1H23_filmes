@@ -1,21 +1,39 @@
-let http = "https"
+const http = "https" /*to easily change between http and https when needed*/
 
-let btnSearchFilm = document.querySelector("#btn-search-film");
-let inputSearchFilm = document.querySelector("#input-search-film");
-let filmsList = document.querySelector("#films-list")
-let showFilm = document.querySelector("#show-film")
-let closeBtn = document.querySelector("#closeCard")
+const btnSearchFilm = document.querySelector("#btn-search-film");
+const inputSearchFilm = document.querySelector("#input-search-film");
+const filmsList = document.querySelector("#films-list")
+const showFilm = document.querySelector("#show-film")
+const favList = document.querySelector("#favorite-films-list")
+const closeBtn = document.querySelector("#closeCard")
 
-const unhideMainDiv = () => {
-    filmsList.style.display = "flex"
-    showFilm.style.display = "none"
+
+const listRender = (param) => {
+    if (param === "filmsList") {
+        filmsList.style.display = "flex"
+        showFilm.style.display = "none"
+        favList.style.display = "none"
+    }
+
+    if (param === "favList") {
+        filmsList.style.display = "none"
+        showFilm.style.display = "none"
+        favList.style.display = "flex"
+
+    }
     showFilm.innerHTML = ""
 }
 
-const useAPI = () => {
+const useAPI = (render) => {
     if (inputSearchFilm.value.length > 0) {
-        filmsList.innerHTML = "";
-        unhideMainDiv()
+        if (render === "favList") {
+            favList.innerHTML = ""
+            listRender("favList")
+        }
+        if (render === "filmsList") {
+            filmsList.innerHTML = "";
+            listRender("filmsList")
+        }
         let films = new Array();
         fetch(http + "://www.omdbapi.com/?apikey=ed5e5ad5&s=" + inputSearchFilm.value)
             .then((resp) => resp.json())
@@ -36,7 +54,7 @@ const useAPI = () => {
                     );
                     films.push(film);
                 });
-                listFilms(films)
+                listFilms(films, render)
 
             })
     }
@@ -44,24 +62,40 @@ const useAPI = () => {
 
 }
 
-let listFilms = async (films) => {
-    let listFilms = await document.querySelector("#films-list");
-    listFilms.innerHTML = "";
+let listFilms = async (films, render) => {
+    listRender(render)
+    let divToFill = ""
+    if (render === "filmsList") {
+        divToFill = document.querySelector("#films-list");
+    } else if (render === "favList") {
+        divToFill = document.querySelector("#favorite-films-list");
+    } else {
+        divToFill = document.querySelector("#films-list");
+    }
+    
+    divToFill.innerHTML = "";
+
     if (films.length > 0) {
         films.forEach(async (film) => {
-            listFilms.appendChild(await film.getCard());
+            divToFill.appendChild(await film.getCard());
             film.getDetailsBtn().onclick = () => {
                 filmDetails(film.id)
+            }
+            if (localStorage.getItem(film.id)) {
+                film.getFavSwitch().setAttribute("checked", true)
+            }
+            film.getFavSwitch().onclick = () => {
+                filmDetails(film.id, true)
             }
         })
     }
 }
 
-let filmDetails = async (id) => {
+let filmDetails = async (id, favorite) => {
     fetch(http + "://www.omdbapi.com/?apikey=ed5e5ad5&i=" + id)
         .then((resp) => resp.json())
-        .then(async (resp) => {
-            //instance object of Film Class
+        .then((resp) => {
+
             let film = new Film(
                 resp.imdbID,
                 resp.Title,
@@ -76,24 +110,49 @@ let filmDetails = async (id) => {
                 resp.Awards
             )
 
-            document.querySelector("#show-film").appendChild(await film.getDetailedCard({
-                title: film.title,
-                url: film.poster,
-                year: film.year,
-                genre: film.category,
-                sinopsis: film.sinopsis,
-                direction: film.direction,
-                actors: film.actors,
-                duration: film.duration,
-                rating: film.rating
-            }))
-            filmsList.style.display = "none"
-            showFilm.style.display = "flex"
+            if (!favorite) {
+                document.querySelector("#show-film").appendChild(film.getDetailedCard({
+                    title: film.title,
+                    url: film.poster,
+                    year: film.year,
+                    genre: film.category,
+                    sinopsis: film.sinopsis,
+                    direction: film.direction,
+                    actors: film.actors,
+                    duration: film.duration,
+                    rating: film.rating
+                }))
+                filmsList.style.display = "none"
+                showFilm.style.display = "flex"
 
-            // Call method for generating card with film details
+            } else {
 
-            // Hide div #films-list
+                if (localStorage.getItem(id)) {
+                    localStorage.removeItem(id)
+                } else {
+                    localStorage.setItem(id, JSON.stringify(film))
+                }
+            }
         });
 }
 
-btnSearchFilm.onclick = () => { useAPI() }
+let getFavorites = () => {
+    let favFilms = new Array()
+    let entries = Object.entries(localStorage)
+    entries.forEach(item => {
+        let filmTest = JSON.parse(localStorage.getItem(item[0]))
+        let film = new Film()
+        film.id = filmTest.id,
+            film.title = filmTest.title,
+            film.year = filmTest.year,
+            film.poster = filmTest.poster,
+
+            favFilms.push(film)
+    });
+    listFilms(favFilms, "favList")
+
+}
+
+btnSearchFilm.onclick = () => { useAPI("filmsList") }
+
+//useAPI("filmsList") 

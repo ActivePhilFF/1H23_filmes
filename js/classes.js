@@ -13,7 +13,7 @@ class Director {
 }
 
 class Film {
-    constructor(id, title, year, category, duration, sinopsis, poster, direction, actors, rating, review, btnDetails) {
+    constructor(id, title, year, category, duration, sinopsis, poster, direction, actors, rating, review, btnDetails, favSwitch) {
         this.id = id;
         this.title = title;
         this.year = year;
@@ -26,6 +26,7 @@ class Film {
         this.rating = rating;
         this.review = review;
         this.btnDetails = null;
+        this.favSwitch = null;
     }
 
     getCard = async () => {
@@ -37,6 +38,8 @@ class Film {
         let divGenre = document.createElement("div");
         let divYear = document.createElement("div");
         let divRating = document.createElement("div");
+        let divSwitch = document.createElement("div");
+        let favLabel = document.createElement("label") /*Extra stuff*/
 
         card.setAttribute("class", "card");
         imgPoster.setAttribute("class", "card-img-top");
@@ -47,6 +50,10 @@ class Film {
         divGenre.setAttribute("style", "flex-grow:1");
         divYear.setAttribute("style", "flex-grow:1");
         divRating.setAttribute("style", "flex-grow:1");
+        divSwitch.setAttribute("class", "form-check form-switch")
+        favLabel.setAttribute("class", "form-check-label") /*Extra stuff*/
+        favLabel.setAttribute("for", "flexSwitchCheckDefault") /*Extra stuff*/
+        favLabel.appendChild(document.createTextNode("Favorite")) /*Extra stuff*/
 
         hCardTitle.appendChild(document.createTextNode(this.title))
         divGenre.appendChild(document.createTextNode(this.genre))
@@ -60,13 +67,18 @@ class Film {
         cardBody.appendChild(hCardTitle)
         cardBody.appendChild(divDetails);
 
+        this.setFavSwitch();
+        divSwitch.appendChild(this.getFavSwitch());
+        divSwitch.appendChild(favLabel);
+
         this.setDetailsBtn();
         cardBody.appendChild(this.getDetailsBtn());
+        cardBody.appendChild(divSwitch) /*Extra stuff*/
 
         return card;
     }
 
-    getDetailedCard = async (content) => {
+    getDetailedCard = (content) => {
         let makeTag = (tag, htmlClass, style, text, url) => {
             let htmlTag = document.createElement(tag);
             if (htmlClass) {
@@ -125,13 +137,24 @@ class Film {
         this.btnDetails.setAttribute("class", "btn btn-dark btnFilmDetails")
     }
 
+    setFavSwitch = () => {
+        this.favSwitch = document.createElement("input")
+        this.favSwitch.setAttribute("type", "checkbox") /*Extra stuff*/
+        this.favSwitch.setAttribute("class", "form-check-input") /*Extra stuff*/
+        this.favSwitch.setAttribute("id", "fav-" + this.id) /*Extra stuff*/
+    }
+
     getCloseBtn = () => {
-       let button = document.createElement('button');
-       button.appendChild(document.createTextNode("Close"));
-       button.setAttribute("id", "closeCard");
-       button.setAttribute("class", "btn btn-dark btnFilmDetails")
-       button.setAttribute("onclick","unhideMainDiv()")
-       return button;
+        let button = document.createElement('button');
+        button.appendChild(document.createTextNode("Close"));
+        button.setAttribute("id", "closeCard");
+        button.setAttribute("class", "btn btn-dark btnFilmDetails")
+        button.setAttribute("onclick", 'listRender("filmsList")')
+        return button;
+    }
+
+    getFavSwitch = () => { 
+        return this.favSwitch
     }
 
     getDetailsBtn = () => {
