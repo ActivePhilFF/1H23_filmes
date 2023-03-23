@@ -7,7 +7,6 @@ const showFilm = document.querySelector("#show-film")
 const favList = document.querySelector("#favorite-films-list")
 const closeBtn = document.querySelector("#closeCard")
 
-
 const listRender = (param) => {
     if (param === "filmsList") {
         filmsList.style.display = "flex"
@@ -72,7 +71,7 @@ let listFilms = async (films, render) => {
     } else {
         divToFill = document.querySelector("#films-list");
     }
-    
+
     divToFill.innerHTML = "";
 
     if (films.length > 0) {
@@ -123,6 +122,7 @@ let filmDetails = async (id, favorite) => {
                     rating: film.rating
                 }))
                 filmsList.style.display = "none"
+                favList.style.display = "none"
                 showFilm.style.display = "flex"
 
             } else {
@@ -142,12 +142,12 @@ let getFavorites = () => {
     entries.forEach(item => {
         let filmTest = JSON.parse(localStorage.getItem(item[0]))
         let film = new Film()
-        film.id = filmTest.id,
-            film.title = filmTest.title,
-            film.year = filmTest.year,
-            film.poster = filmTest.poster,
+        film.id = filmTest.id
+        film.title = filmTest.title
+        film.year = filmTest.year
+        film.poster = filmTest.poster
 
-            favFilms.push(film)
+        favFilms.push(film)
     });
     listFilms(favFilms, "favList")
 
