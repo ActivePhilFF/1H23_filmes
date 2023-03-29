@@ -149,7 +149,7 @@ class Film {
         button.appendChild(document.createTextNode("Close"));
         button.setAttribute("id", "closeCard");
         button.setAttribute("class", "btn btn-dark btnFilmDetails")
-        button.setAttribute("onclick", 'listRender("filmsList")')
+        button.setAttribute("onclick", 'listRender()')
         return button;
     }
 

@@ -32,6 +32,23 @@ body {
     max-height: 100%;
 }
 
-/*.navParagraph1H23{
-    color: #F35;
-}*/
+.newFilmDiv {
+    border-radius: 4%;
+    margin: 2% auto 5% auto;
+    padding: 2%;
+    width: 50%;
+    background-color: #222222;
+}
+
+.formSection {
+    display: flex
+}
+
+.formSection label {
+    color: white;
+    width: 20%;
+}
+
+.formSection input {
+    width: 80%;
+}

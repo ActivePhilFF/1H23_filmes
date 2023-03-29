@@ -26,7 +26,7 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#" style="color:#F35"  onclick='listRender("filmsList")'>
+                        <a class="nav-link active" aria-current="page" href="#" style="color:#F35"  onclick='getHome()'>
                             Home
                         </a>
                     </li>
@@ -59,9 +59,52 @@
         </div>
     </nav>
     <main>
+        <div id="new-film-button" style="display: none;">
+            <button class="btn btn-outline-success" onclick="listRender('newFilm')">New Film</button>
+        </div>
         <div id="films-list"></div>
+            <div id="new-film-div" class="newFilmDiv">
+                <form id="new-film-form" onsubmit="return false">
+                <div class="mb-3 formSection">
+                    <label class="form-label">Film Title</label>
+                    <input type="text" class="form-control" id="newFormTitle" placeholder="Film Title" required>
+                  </div>
+                <div class="mb-3 formSection">
+                    <label class="form-label">Poster URL</label>
+                    <input type="url" class="form-control" id="newFormURL" placeholder="Poster URL" required>
+                  </div>
+                  <div class="mb-3 formSection">
+                    <label for="exampleFormControlTextarea1" class="form-label" required>Sinopsis</label>
+                    <textarea class="form-control" id="newFormSinopsis" rows="3" required></textarea>
+                  </div>
+                  <div class="mb-3 formSection">
+                    <label class="form-label">Direction</label>
+                    <input type="text" class="form-control" id="newFormDirection" placeholder="Direction" required>
+                  </div>
+                  <div class="mb-3 formSection">
+                    <label class="form-label">Cast</label>
+                    <input type="text" class="form-control" id="newFormCast" placeholder="Cast" required>
+                  </div>              
+                  <div class="mb-3 formSection">
+                    <label class="form-label">Year</label>
+                    <input type="number" class="form-control" id="newFormYear" placeholder="Year" required>
+                  </div>              
+                  <div class="mb-3 formSection">
+                    <label class="form-label">Genre</label>
+                    <input type="text" class="form-control" id="newFormGenre" placeholder="Genre" required>
+                  </div>              
+                  <div class="mb-3 formSection">
+                    <label class="form-label">Rating</label>
+                    <input type="number" step="0.1" class="form-control" id="newFormRating" placeholder="Rating" required>
+                  </div>           
+                  <div>
+                    <button class="btn btn-outline-success" id="new-film-btn">Save</button>
+                    <button class="btn btn-outline-danger" onclick="getHome()">Cancel</button>
+                  </div>   
+                </form>
+            </div>
+      
         <div class="d-flex justify-content-center" id="show-film"></div>
-        <div id="favorite-films-list"></div>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
