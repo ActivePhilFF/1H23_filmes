@@ -14,17 +14,18 @@ const getFormData = () => {
   const getFormField = (id) => {
     return document.querySelector(`#${id}`).value;
   };
-  let formData = {};
+  let formData = new Film();
 
-  formData.id = "fakeID";
+  formData.id = "fake-" + (Math.floor(Math.random() * 10000000) + 1);
   formData.title = getFormField("newFormTitle");
   formData.poster = getFormField("newFormURL");
   formData.sinopsis = getFormField("newFormSinopsis");
-  formData.direction = getFormField("newFormDirection");
-  formData.cast = getFormField("newFormCast");
+  formData.direction = getFormField("newFormDirection").split(",");
+  formData.actors = getFormField("newFormCast").split(",");
   formData.year = getFormField("newFormYear");
-  formData.genre = getFormField("newFormGenre");
+  formData.category = getFormField("newFormGenre").split(",");
   formData.rating = getFormField("newFormRating");
+  formData.duration = "Unknown";
 
   return formData;
 };
@@ -38,6 +39,7 @@ const listRender = (param) => {
   } else {
     filmsList.style.display = "flex";
     showFilm.style.display = "none";
+    newFilmDiv.style.display = "none";
     showFilm.innerHTML = "";
   }
 };
@@ -110,48 +112,78 @@ let listFilms = async (films) => {
 };
 
 let filmDetails = async (id, favorite) => {
-  fetch(http + "://www.omdbapi.com/?apikey=ed5e5ad5&i=" + id)
-    .then((resp) => resp.json())
-    .then((resp) => {
-      let film = new Film(
-        resp.imdbID,
-        resp.Title,
-        resp.Year,
-        resp.Genre.split(","),
-        resp.Runtime,
-        resp.Plot,
-        resp.Poster,
-        resp.Director,
-        resp.Actors.split(","),
-        resp.imdbRating,
-        resp.Awards
-      );
+  const getInnerCard = () => {
+    showFilm.appendChild(
+      film.getDetailedCard({
+        title: film.title,
+        url: film.poster,
+        year: film.year,
+        category: film.category,
+        sinopsis: film.sinopsis,
+        direction: film.direction,
+        actors: film.actors,
+        duration: film.duration,
+        rating: film.rating,
+      })
+    );
+    filmsList.style.display = "none";
+    showFilm.style.display = "flex";
+  };
 
-      if (!favorite) {
-        showFilm.appendChild(
-          film.getDetailedCard({
-            title: film.title,
-            url: film.poster,
-            year: film.year,
-            genre: film.category,
-            sinopsis: film.sinopsis,
-            direction: film.direction,
-            actors: film.actors,
-            duration: film.duration,
-            rating: film.rating,
-          })
-        );
-        filmsList.style.display = "none";
-        favList.style.display = "none";
-        showFilm.style.display = "flex";
-      } else {
-        if (localStorage.getItem(id)) {
-          localStorage.removeItem(id);
+  const favoriteInnerMethod = () => {
+    if (localStorage.getItem(id)) {
+      localStorage.removeItem(id);
+    } else {
+      localStorage.setItem(id, JSON.stringify(film));
+    }
+  };
+
+  let film = new Film();
+  let localFilm = new Film();
+  let prefix = id.split("-");
+
+  if (prefix[0] == "fake") {
+    if (!favorite) {
+      localFilm = JSON.parse(localStorage.getItem(id));
+      film.id = localFilm.id;
+      film.title = localFilm.title;
+      film.year = localFilm.year;
+      film.category = localFilm.category;
+      film.duration = localFilm.duration;
+      film.sinopsis = localFilm.sinopsis;
+      film.poster = localFilm.poster;
+      film.direction = localFilm.direction;
+      film.actors = localFilm.actors;
+      film.rating = localFilm.rating;
+      film.review = localFilm.review;
+
+      getInnerCard();
+    } else {
+      favoriteInnerMethod();
+    }
+  } else {
+    fetch(http + "://www.omdbapi.com/?apikey=ed5e5ad5&i=" + id)
+      .then((resp) => resp.json())
+      .then((resp) => {
+        film.id = resp.imdbID;
+        film.title = resp.Title;
+        film.year = resp.Year;
+        film.category = resp.Genre.split(",");
+        film.duration = resp.Runtime;
+        film.sinopsis = resp.Plot;
+        film.poster = resp.Poster;
+        film.direction = resp.Director;
+        film.actors = resp.Actors.split(",");
+        film.rating = resp.imdbRating;
+        film.review = resp.Awards;
+
+        if (!favorite) {
+          getInnerCard();
         } else {
-          localStorage.setItem(id, JSON.stringify(film));
+          favoriteInnerMethod();
         }
-      }
-    });
+      });
+  }
 };
 
 let getFavorites = () => {
@@ -169,22 +201,7 @@ let getFavorites = () => {
   });
   listFilms(favFilms);
   newFilmBtn.style.display = "flex";
-};
-
-const saveToLocalStorage = (newFilm) => {
-  let film = new Film();
-  film.id = newFilm.id;
-  film.title = newFilm.title;
-  film.poster = newFilm.poster;
-  film.year = newFilm.year;
-  film.direction = newFilm.direction;
-  film.sinopsis = newFilm.sinopsis;
-  film.actors = newFilm.cast;
-  film.genre = newFilm.genre;
-  film.rating = newFilm.rating;
-
-  console.log(film);
-  localStorage.setItem(film.id, JSON.stringify(film));
+  return false
 };
 
 btnSearchFilm.onclick = () => {
@@ -193,11 +210,7 @@ btnSearchFilm.onclick = () => {
 
 newFilmForm.onsubmit = () => {
   let newFilm = getFormData();
-  saveToLocalStorage(newFilm);
+  localStorage.setItem(newFilm.id, JSON.stringify(newFilm));
+  getFavorites();
   return false;
 };
-
-/* newFilmFormBtn.onclick = () =>
-console.log("The code ran!")
- */
-//useAPI("filmsList")

@@ -36,6 +36,7 @@ body {
     border-radius: 4%;
     margin: 2% auto 5% auto;
     padding: 2%;
+    display: none;
     width: 50%;
     background-color: #222222;
 }
@@ -51,4 +52,16 @@ body {
 
 .formSection input {
     width: 80%;
+}
+
+.card-img-top {
+    max-width: 300px;
+}
+
+.poster-settings {
+    max-height: 300px;
+}
+
+#new-film-button {
+    display: none;
 }
