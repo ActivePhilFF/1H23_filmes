@@ -9,25 +9,68 @@ const newFilmBtn = document.querySelector("#new-film-button");
 const showFilm = document.querySelector("#show-film");
 const closeBtn = document.querySelector("#closeCard");
 let lastSearch = new Array();
+let editing = "";
 
-const getFormData = () => {
-  const getFormField = (id) => {
-    return document.querySelector(`#${id}`).value;
-  };
-  let formData = new Film();
+const favoriteInnerMethod = (id, film) => {
+  if (localStorage.getItem(id)) {
+    localStorage.removeItem(id);
+  } else {
+    film.favorite = true;
+    localStorage.setItem(id, JSON.stringify(film));
+  }
+};
 
-  formData.id = "fake-" + (Math.floor(Math.random() * 10000000) + 1);
-  formData.title = getFormField("newFormTitle");
-  formData.poster = getFormField("newFormURL");
-  formData.sinopsis = getFormField("newFormSinopsis");
-  formData.direction = getFormField("newFormDirection").split(",");
-  formData.actors = getFormField("newFormCast").split(",");
-  formData.year = getFormField("newFormYear");
-  formData.category = getFormField("newFormGenre").split(",");
-  formData.rating = getFormField("newFormRating");
-  formData.duration = "Unknown";
+const getFormData = (edit, objectOnEdit) => {
+  if (edit) {
+    const setFormField = (tagId, insetValue) => {
+      document.querySelector(`#${tagId}`).value = insetValue;
+    };
 
-  return formData;
+    setFormField("newFormTitle", objectOnEdit.title);
+    setFormField("newFormURL", objectOnEdit.poster);
+    setFormField("newFormSinopsis", objectOnEdit.sinopsis);
+    setFormField("newFormDirection", objectOnEdit.direction);
+    setFormField("newFormCast", objectOnEdit.actors);
+    setFormField("newFormYear", objectOnEdit.year);
+    setFormField("newFormGenre", objectOnEdit.category);
+    setFormField("newFormDuration", objectOnEdit.duration);
+    setFormField("newFormRating", objectOnEdit.rating);
+
+    listRender("newFilm");
+  } else {
+    const getFormField = (tagId) => {
+      return document.querySelector(`#${tagId}`).value;
+    };
+
+    let formData = new Film();
+
+    if (editing === "") {
+      formData.id = "fake-" + (Math.floor(Math.random() * 10000000) + 1);
+    } else {
+      favoriteInnerMethod(editing);
+      let tempId;
+      try {
+        tempId = editing.split("-");
+      } catch (e) {
+        console.log("Error: \n" + e);
+      }
+      if (tempId[1]) {
+        editing = tempId[1];
+      }
+      formData.id = "fake-" + editing;
+    }
+    formData.title = getFormField("newFormTitle");
+    formData.poster = getFormField("newFormURL");
+    formData.sinopsis = getFormField("newFormSinopsis");
+    formData.direction = getFormField("newFormDirection").split(",");
+    formData.actors = getFormField("newFormCast").split(",");
+    formData.year = getFormField("newFormYear");
+    formData.category = getFormField("newFormGenre").split(",");
+    formData.rating = getFormField("newFormRating");
+    formData.duration = getFormField("newFormDuration");
+
+    return formData;
+  }
 };
 const listRender = (param) => {
   if (param === "newFilm") {
@@ -45,6 +88,7 @@ const listRender = (param) => {
 };
 
 const getHome = () => {
+  editing = "";
   newFilmBtn.style.display = "none";
   if (lastSearch.length === 0) {
     filmsList.innerHTML = "";
@@ -54,6 +98,7 @@ const getHome = () => {
     listFilms(lastSearch);
     lastSearch = new Array();
   }
+  return false;
 };
 
 const useAPI = () => {
@@ -111,8 +156,17 @@ let listFilms = async (films) => {
   }
 };
 
-let filmDetails = async (id, favorite) => {
-  const getInnerCard = () => {
+let filmDetails = async (id, store) => {
+  editing = id;
+  const showEdit = (editId) => {
+    if (!document.querySelector(`#fav-${editId}`).checked) {
+      document.querySelector("#editCard").style.display = "none";
+    } else {
+      document.querySelector("#editCard").style.display = "grid";
+    }
+  };
+  const getInnerCard = (isFavorite) => {
+    let bool = film.favorite == true ? true : false;
     showFilm.appendChild(
       film.getDetailedCard({
         title: film.title,
@@ -124,18 +178,12 @@ let filmDetails = async (id, favorite) => {
         actors: film.actors,
         duration: film.duration,
         rating: film.rating,
+        favorite: bool,
       })
     );
+    showEdit(id);
     filmsList.style.display = "none";
     showFilm.style.display = "flex";
-  };
-
-  const favoriteInnerMethod = () => {
-    if (localStorage.getItem(id)) {
-      localStorage.removeItem(id);
-    } else {
-      localStorage.setItem(id, JSON.stringify(film));
-    }
   };
 
   let film = new Film();
@@ -143,7 +191,7 @@ let filmDetails = async (id, favorite) => {
   let prefix = id.split("-");
 
   if (prefix[0] == "fake") {
-    if (!favorite) {
+    if (!store) {
       localFilm = JSON.parse(localStorage.getItem(id));
       film.id = localFilm.id;
       film.title = localFilm.title;
@@ -156,12 +204,16 @@ let filmDetails = async (id, favorite) => {
       film.actors = localFilm.actors;
       film.rating = localFilm.rating;
       film.review = localFilm.review;
+      film.favorite = localFilm.favorite;
 
-      getInnerCard();
+      getInnerCard(localFilm.favorite);
     } else {
-      favoriteInnerMethod();
+      favoriteInnerMethod(id, film);
     }
   } else {
+    if (localStorage.getItem("fake-" + id)) {
+      favoriteInnerMethod("fake-" + id);
+    }
     fetch(http + "://www.omdbapi.com/?apikey=ed5e5ad5&i=" + id)
       .then((resp) => resp.json())
       .then((resp) => {
@@ -177,12 +229,22 @@ let filmDetails = async (id, favorite) => {
         film.rating = resp.imdbRating;
         film.review = resp.Awards;
 
-        if (!favorite) {
+        if (!store) {
           getInnerCard();
         } else {
-          favoriteInnerMethod();
+          favoriteInnerMethod(id, film);
         }
       });
+  }
+};
+
+const editFilm = () => {
+  try {
+    let filmOnEdit = localStorage.getItem(editing);
+    filmOnEdit = JSON.parse(filmOnEdit);
+    getFormData(true, filmOnEdit);
+  } catch (e) {
+    console.log("Error: \n");
   }
 };
 
@@ -196,12 +258,13 @@ let getFavorites = () => {
     film.title = filmTest.title;
     film.year = filmTest.year;
     film.poster = filmTest.poster;
+    film.favorite = filmTest.favorite;
 
     favFilms.push(film);
   });
   listFilms(favFilms);
   newFilmBtn.style.display = "flex";
-  return false
+  return false;
 };
 
 btnSearchFilm.onclick = () => {
